@@ -33,8 +33,12 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.serialization)
+            implementation(libs.ktor.serialization.json)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines.extensions)
+            implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -42,7 +46,7 @@ kotlin {
             implementation(libs.turbine)
         }
         androidMain.dependencies {
-            implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.android)
             implementation(libs.sqldelight.android.driver)
         }
         iosMain.dependencies {
@@ -50,6 +54,7 @@ kotlin {
             implementation(libs.sqldelight.native.driver)
         }
     }
+    task("testClasses")
 }
 
 android {
@@ -61,5 +66,13 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+}
+
+sqldelight{
+    databases{
+        create("TranslatorDatabase") {
+            packageName.set("com.emendo.translator_kmp.database")
+        }
     }
 }

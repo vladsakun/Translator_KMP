@@ -54,6 +54,8 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.material.icons.extended)
 
+    implementation(libs.ktor.client.android)
+
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     kapt(libs.hilt.compiler)
