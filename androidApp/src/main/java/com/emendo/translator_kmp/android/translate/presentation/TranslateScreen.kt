@@ -4,22 +4,26 @@ import android.speech.tts.TextToSpeech
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
+import com.emendo.translator_kmp.android.R
 import com.emendo.translator_kmp.android.translate.presentation.components.LanguageDropDown
 import com.emendo.translator_kmp.android.translate.presentation.components.SwapLanguagesButton
 import com.emendo.translator_kmp.android.translate.presentation.components.TranslateTextField
+import com.emendo.translator_kmp.android.translate.presentation.components.rememberTextToSpeech
 import com.emendo.translator_kmp.translate.presentation.TranslateEvent
 import com.emendo.translator_kmp.translate.presentation.TranslateState
-import com.emendo.translator_kmp.android.R
-import com.emendo.translator_kmp.android.translate.presentation.components.rememberTextToSpeech
 import java.util.Locale
 
 @Composable
@@ -30,8 +34,20 @@ fun TranslateScreen(
   val context = LocalContext.current
   Scaffold(
     floatingActionButton = {
-
-    }
+      FloatingActionButton(
+        onClick = { onEvent(TranslateEvent.RecordAudio) },
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        modifier = Modifier.size(75.dp),
+        shape = RoundedCornerShape(100),
+      ) {
+        Icon(
+          imageVector = ImageVector.vectorResource(id = R.drawable.mic),
+          contentDescription = stringResource(id = R.string.record_audio)
+        )
+      }
+    },
+    floatingActionButtonPosition = FabPosition.Center,
   ) { paddingValues ->
     LazyColumn(
       modifier = Modifier
