@@ -28,7 +28,7 @@ struct VoiceRecorderButton: View {
     
     var icon: some View {
         switch displayState {
-        case .waitingToTalk:
+        case .speaking:
             return Image(systemName: "stop.fill")
         case .displayingResults:
             return Image(systemName: "checkmark")

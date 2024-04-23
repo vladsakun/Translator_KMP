@@ -1,11 +1,13 @@
 package com.emendo.translator_kmp.android.voice_to_text.presentation
 
+import android.Manifest
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
@@ -42,24 +44,22 @@ fun VoiceToTextScreen(
     onResult = { isGranted ->
       onEvent(
         VoiceToTextEvent.PermissionResult(
-          isGranted,
-          !isGranted && (context as ComponentActivity).shouldShowRequestPermissionRationale(
-            android.Manifest.permission.RECORD_AUDIO
-          )
+          isGranted = isGranted,
+          isPermanentlyDeclined = !isGranted && !(context as ComponentActivity)
+            .shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)
         )
       )
     }
   )
-
   LaunchedEffect(recordAudioLauncher) {
-    recordAudioLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+    recordAudioLauncher.launch(Manifest.permission.RECORD_AUDIO)
   }
 
   Scaffold(
     floatingActionButtonPosition = FabPosition.Center,
     floatingActionButton = {
       Row(
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
       ) {
         FloatingActionButton(
           onClick = {
@@ -69,9 +69,11 @@ fun VoiceToTextScreen(
               onResult(state.spokenText)
             }
           },
-          modifier = Modifier.size(75.dp),
-          contentColor = MaterialTheme.colorScheme.onPrimary,
           containerColor = MaterialTheme.colorScheme.primary,
+          contentColor = MaterialTheme.colorScheme.onPrimary,
+          shape = RoundedCornerShape(100),
+          modifier = Modifier
+            .size(75.dp)
         ) {
           AnimatedContent(targetState = state.displayState) { displayState ->
             when (displayState) {
@@ -82,7 +84,6 @@ fun VoiceToTextScreen(
                   modifier = Modifier.size(50.dp)
                 )
               }
-
               DisplayState.DISPLAYING_RESULTS -> {
                 Icon(
                   imageVector = Icons.Rounded.Check,
@@ -90,7 +91,6 @@ fun VoiceToTextScreen(
                   modifier = Modifier.size(50.dp)
                 )
               }
-
               else -> {
                 Icon(
                   imageVector = ImageVector.vectorResource(id = R.drawable.mic),
@@ -101,46 +101,45 @@ fun VoiceToTextScreen(
             }
           }
         }
-      }
-
-      if (state.displayState == DisplayState.DISPLAYING_RESULTS) {
-        IconButton(
-          onClick = { onEvent(VoiceToTextEvent.ToggleRecording(languageCode)) }
-        ) {
-          Icon(
-            imageVector = Icons.Rounded.Refresh,
-            contentDescription = stringResource(id = R.string.record_again),
-            tint = LightBlue,
-          )
+        if (state.displayState == DisplayState.DISPLAYING_RESULTS) {
+          IconButton(onClick = {
+            onEvent(VoiceToTextEvent.ToggleRecording(languageCode))
+          }) {
+            Icon(
+              imageVector = Icons.Rounded.Refresh,
+              contentDescription = stringResource(id = R.string.record_again),
+              tint = LightBlue
+            )
+          }
         }
       }
     }
-  ) { paddingValues ->
+  ) { padding ->
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .padding(paddingValues)
+        .padding(padding)
     ) {
       Box(modifier = Modifier.fillMaxWidth()) {
         IconButton(
-          onClick = { onEvent(VoiceToTextEvent.Close) },
-          modifier = Modifier.align(Alignment.CenterStart),
+          onClick = {
+            onEvent(VoiceToTextEvent.Close)
+          },
+          modifier = Modifier.align(Alignment.CenterStart)
         ) {
           Icon(
             imageVector = Icons.Rounded.Close,
-            contentDescription = stringResource(id = R.string.close),
+            contentDescription = stringResource(id = R.string.close)
           )
         }
-
         if (state.displayState == DisplayState.SPEAKING) {
           Text(
             text = stringResource(id = R.string.listening),
             color = LightBlue,
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.align(Alignment.Center)
           )
         }
       }
-
       Column(
         modifier = Modifier
           .fillMaxWidth()
@@ -149,44 +148,40 @@ fun VoiceToTextScreen(
           .weight(1f)
           .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally
       ) {
         AnimatedContent(targetState = state.displayState) { displayState ->
           when (displayState) {
             DisplayState.WAITING_TO_TALK -> {
               Text(
-                text = stringResource(id = R.string.start_talking),
+                text = stringResource(id = R.string.listening),
                 style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Center
               )
             }
-
             DisplayState.SPEAKING -> {
               VoiceRecorderDisplay(
-                powerRation = state.powerRatios,
+                powerRatios = state.powerRatios,
                 modifier = Modifier
                   .fillMaxWidth()
-                  .height(100.dp),
+                  .height(100.dp)
               )
             }
-
             DisplayState.DISPLAYING_RESULTS -> {
               Text(
                 text = state.spokenText,
                 style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Center
               )
             }
-
             DisplayState.ERROR -> {
               Text(
                 text = state.recordError ?: "Unknown error",
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.error,
+                color = MaterialTheme.colorScheme.error
               )
             }
-
             else -> Unit
           }
         }

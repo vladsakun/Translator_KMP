@@ -41,7 +41,7 @@ class VoiceToTextViewModel(
         if (state.value.displayState == DisplayState.SPEAKING) {
           _state.update {
             it.copy(
-              powerRatios = it.powerRatios + parser.state.value.powerRation
+              powerRatios = it.powerRatios + parser.state.value.powerRatio
             )
           }
         }

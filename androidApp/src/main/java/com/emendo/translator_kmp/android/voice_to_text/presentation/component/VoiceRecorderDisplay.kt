@@ -23,7 +23,7 @@ import kotlin.random.Random
 
 @Composable
 fun VoiceRecorderDisplay(
-  powerRation: List<Float>,
+  powerRatios: List<Float>,
   modifier: Modifier = Modifier,
 ) {
   val primary = MaterialTheme.colorScheme.primary
@@ -40,8 +40,8 @@ fun VoiceRecorderDisplay(
         vertical = 8.dp
       )
       .drawBehind {
-        val powerRationWidth = 3.dp.toPx()
-        val powerRationCount = (size.width / (2 * powerRationWidth)).toInt()
+        val powerRatioWidth = 3.dp.toPx()
+        val powerRatioCount = (size.width / (2 * powerRatioWidth)).toInt()
 
         clipRect(
           left = 0f,
@@ -49,19 +49,19 @@ fun VoiceRecorderDisplay(
           right = size.width,
           bottom = size.height
         ) {
-          powerRation
-            .takeLast(powerRationCount)
+          powerRatios
+            .takeLast(powerRatioCount)
             .reversed()
-            .forEachIndexed { index, ration ->
-              val yTopStart = center.y - (size.height / 2f) * ration
+            .forEachIndexed { i, ratio ->
+              val yTopStart = center.y - (size.height / 2f) * ratio
               drawRoundRect(
                 color = primary,
                 topLeft = Offset(
-                  x = size.width - index * 2 * powerRationWidth,
-                  y = yTopStart,
+                  x = size.width - i * 2 * powerRatioWidth,
+                  y = yTopStart
                 ),
                 size = Size(
-                  width = powerRationWidth,
+                  width = powerRatioWidth,
                   height = (center.y - yTopStart) * 2f
                 ),
                 cornerRadius = CornerRadius(100f)
@@ -74,10 +74,10 @@ fun VoiceRecorderDisplay(
 
 @Preview
 @Composable
-private fun VoiceRecorderDisplayPreview() {
+fun VoiceRecorderDisplayPreview() {
   TranslatorTheme {
     VoiceRecorderDisplay(
-      powerRation = (0..100).map {
+      powerRatios = (0..100).map {
         Random.nextFloat()
       },
       modifier = Modifier

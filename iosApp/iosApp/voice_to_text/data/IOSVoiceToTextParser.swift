@@ -14,7 +14,7 @@ import Combine
 class IOSVoiceToTextParser: VoiceToTextParser, ObservableObject {
     
     private let _state = IOSMutableStateFlow(
-        initialValue: VoiceToTextParserState(result: "", error: nil, powerRation: 0.0, isSpeaking: false)
+        initialValue: VoiceToTextParserState(result: "", error: nil, powerRatio: 0.0, isSpeaking: false)
     )
     var state: CommonStateFlow<VoiceToTextParserState> { _state }
     
@@ -35,7 +35,7 @@ class IOSVoiceToTextParser: VoiceToTextParser, ObservableObject {
     
     func reset() {
         self.stopListening()
-        _state.value = VoiceToTextParserState(result: "", error: nil, powerRation: 0.0, isSpeaking: false)
+        _state.value = VoiceToTextParserState(result: "", error: nil, powerRatio: 0.0, isSpeaking: false)
     }
     
     func startListening(languageCode: String) {
@@ -143,7 +143,7 @@ class IOSVoiceToTextParser: VoiceToTextParser, ObservableObject {
         _state.value = VoiceToTextParserState(
             result: result ?? currentState?.result ?? "",
             error: error ?? currentState?.error,
-            powerRation: Float(powerRation ?? CGFloat(currentState?.powerRation ?? 0.0)),
+            powerRatio: Float(powerRation ?? CGFloat(currentState?.powerRatio ?? 0.0)),
             isSpeaking: isSpeaking ?? currentState?.isSpeaking ?? false
         )
     }

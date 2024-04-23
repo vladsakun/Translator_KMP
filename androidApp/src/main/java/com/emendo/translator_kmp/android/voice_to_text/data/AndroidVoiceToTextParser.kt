@@ -36,7 +36,6 @@ class AndroidVoiceToTextParser(
       putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
       putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
     }
-
     recognizer.setRecognitionListener(this)
     recognizer.startListening(intent)
     _state.update { it.copy(isSpeaking = true) }
@@ -52,48 +51,50 @@ class AndroidVoiceToTextParser(
   }
 
   override fun reset() {
-    _state.update { VoiceToTextParserState() }
+    _state.value = VoiceToTextParserState()
   }
 
-  override fun onReadyForSpeech(params: Bundle?) {
+  override fun onReadyForSpeech(p0: Bundle?) {
     _state.update { it.copy(error = null) }
   }
 
   override fun onBeginningOfSpeech() = Unit
 
-  override fun onRmsChanged(rmsdB: Float) {
+  override fun onRmsChanged(rmsDb: Float) {
     _state.update {
       it.copy(
-        powerRation = rmsdB * (1f / 12f - (-2f))
+        powerRatio = rmsDb * (1f / (12f - (-2f)))
       )
     }
   }
 
-  override fun onBufferReceived(buffer: ByteArray?) = Unit
+  override fun onBufferReceived(p0: ByteArray?) = Unit
 
   override fun onEndOfSpeech() {
     _state.update { it.copy(isSpeaking = false) }
   }
 
-  override fun onError(error: Int) {
-    if (error == ERROR_CLIENT) {
+  override fun onError(code: Int) {
+    if (code == ERROR_CLIENT) {
       return
     }
-    _state.update { it.copy(error = "Error: $error") }
+    _state.update { it.copy(error = "Error: $code") }
   }
 
-  override fun onResults(results: Bundle?) {
-    results
+  override fun onResults(result: Bundle?) {
+    result
       ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-      ?.firstOrNull()
+      ?.getOrNull(0)
       ?.let { text ->
         _state.update {
-          it.copy(result = text)
+          it.copy(
+            result = text
+          )
         }
       }
   }
 
-  override fun onPartialResults(partialResults: Bundle?) = Unit
+  override fun onPartialResults(p0: Bundle?) = Unit
 
-  override fun onEvent(eventType: Int, params: Bundle?) = Unit
+  override fun onEvent(p0: Int, p1: Bundle?) = Unit
 }
