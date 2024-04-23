@@ -17,4 +17,18 @@ https://github.com/vladsakun/Translator_KMP/assets/37827156/d3a86d1a-7d2f-40ca-9
 https://github.com/vladsakun/Translator_KMP/assets/37827156/ea8d0e3f-b594-4b9f-bcd7-8ff3e519b78d
 
 
+## KMP libraries 📚
+- KTor (network requests)
+- Sqldelight (sql database)
+- Kotlinx datetime
+- Kotlinx coroutines core
 
+## Andorid libraries 🦾
+- Jetpack Compose
+- Hilt
+- Coil
+- Kotlin coroutines android
+
+## iOS libraries 🧃
+- SwiftUI
+- Combine
