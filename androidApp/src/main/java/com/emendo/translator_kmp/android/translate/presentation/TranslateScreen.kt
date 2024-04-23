@@ -4,9 +4,11 @@ import android.speech.tts.TextToSpeech
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -18,10 +20,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import com.emendo.translator_kmp.android.R
-import com.emendo.translator_kmp.android.translate.presentation.components.LanguageDropDown
-import com.emendo.translator_kmp.android.translate.presentation.components.SwapLanguagesButton
-import com.emendo.translator_kmp.android.translate.presentation.components.TranslateTextField
-import com.emendo.translator_kmp.android.translate.presentation.components.rememberTextToSpeech
+import com.emendo.translator_kmp.android.translate.presentation.components.*
+import com.emendo.translator_kmp.translate.domain.translate.TranslateError
 import com.emendo.translator_kmp.translate.presentation.TranslateEvent
 import com.emendo.translator_kmp.translate.presentation.TranslateState
 import java.util.Locale
@@ -32,6 +32,21 @@ fun TranslateScreen(
   onEvent: (TranslateEvent) -> Unit,
 ) {
   val context = LocalContext.current
+
+  LaunchedEffect(key1 = state.error) {
+    val message = when (state.error) {
+      TranslateError.SERVICE_UNAVAILABLE -> context.getString(R.string.error_service_unavailable)
+      TranslateError.CLIENT_ERROR -> context.getString(R.string.client_error)
+      TranslateError.SERVER_ERROR -> context.getString(R.string.server_error)
+      TranslateError.UNKNOWN_ERROR -> context.getString(R.string.unknown_error)
+      else -> null
+    }
+    message?.let {
+      Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+      onEvent(TranslateEvent.OnErrorSeen)
+    }
+  }
+
   Scaffold(
     floatingActionButton = {
       FloatingActionButton(
@@ -118,6 +133,24 @@ fun TranslateScreen(
             tts.speak(state.toText, TextToSpeech.QUEUE_FLUSH, null, null)
           },
           onTextFieldClick = { onEvent(TranslateEvent.EditTranslation) },
+          modifier = Modifier.fillMaxWidth()
+        )
+      }
+      item {
+        if (state.history.isNotEmpty()) {
+          Text(
+            text = stringResource(id = R.string.history),
+            style = MaterialTheme.typography.headlineMedium,
+          )
+        }
+      }
+
+      items(state.history) { item ->
+        TranslateHistoryItem(
+          item = item,
+          onClick = {
+            onEvent(TranslateEvent.SelectHistoryItem(item))
+          },
           modifier = Modifier.fillMaxWidth()
         )
       }
